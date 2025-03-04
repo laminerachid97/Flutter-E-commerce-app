@@ -1,0 +1,632 @@
+import 'package:animations/core/helpers/helper_color.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+  @override
+  State<Home> createState() => _Home();
+}
+
+class _Home extends State<Home> {
+  final ScrollController _scrollController = ScrollController();
+  bool isExpanded = false;
+  final double initialSize = 200;
+  int _currentPage = 0;
+  bool checked = false;
+  List<int> numberchecked = [];
+  List<int> sizes = [];
+  String _color = '';
+  Map<String, dynamic> _mycart = {};
+
+  void scrollToTop() {
+    if (!isExpanded) {
+      _scrollController.animateTo(
+        0.0,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.elasticOut,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+      final List<Map<String, Object>> _images = [
+    {
+      "id": 1,
+      "name": "Nike Air Force 1",
+      "brand": "Nike",
+      "price": 99.00,
+      "oldprice": 130.00,
+      "liked": 0,
+      "sizes": [38, 39, 40, 41, 42, 43, 44],
+      "colors": ["White", "black", "red"],
+      "image": "https://shopigo.com/cdn/shop/collections/nike.webp?v=1709818833",
+      "description": "A classic sneaker with a comfortable fit and timeless design.",
+    },
+    {
+      "id": 2,
+      "name": "Adidas Ultraboost",
+      "brand": "Adidas",
+      "price": 120.00,
+      "oldprice": 180.00,
+      "liked": 1,
+      "sizes": [39, 40, 41, 42, 43, 44, 45],
+      "colors": ["White", "black", "red", "blue"],
+      "image": "https://www.reuters.com/resizer/v2/N5Y4PJR6EBNTLDXVI23VSZ6EZA.jpg?auth=d80f4a315a076a2609cb04dd7195eebb7b55606903b9e88f2a85905437f28532&width=6714&quality=80",
+      "description": "A high-performance running shoe with responsive cushioning.",
+    },
+    {
+      "id": 3,
+      "name": "Puma RS-X",
+      "brand": "Puma",
+      "price": 99.00,
+      "oldprice": 110.00,
+      "liked": 1,
+      "sizes": [38, 39, 40, 41, 42, 43],
+      "colors": ["White", "black", "red", "blue"],
+      "image": "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa/global/368015/01/sv01/fnd/PNA/w/1000/h/1000",
+      "description": "A stylish sneaker with a retro-futuristic design.",
+    },
+    {
+      "id": 4,
+      "name": "New Balance 550",
+      "brand": "New Balance",
+      "price": 150.00,
+      "oldprice": 180.00,
+      "liked": 0,
+      "sizes": [39, 40, 41, 42, 43, 44],
+      "colors": ["black", "red", "blue", "White", "green"],
+      "image": "https://nb.scene7.com/is/image/NB/bb550wt1_nb_02_i?\$pdpflexf2\$&wid=440&hei=440",
+      "description": "A modern take on the classic basketball sneaker from the 80s.",
+    },
+    {
+      "id": 5,
+      "name": "Jordan 1 Retro High",
+      "brand": "Jordan",
+      "price": 150.00,
+      "oldprice": 200.00,
+      "liked": 1,
+      "sizes": [40, 41, 42, 43, 44, 45],
+      "colors": ["White", "black", "red"],
+      "image": "https://cdn.luxe.digital/media/20230927084701/best-jordans-of-all-time-ranking-list-luxe-digital-1200x600.jpg",
+      "description": "A legendary basketball sneaker with premium leather and iconic style.",
+    },
+  ];
+
+    return PopScope(
+    onPopInvokedWithResult: (didPop, result) {
+      if (!didPop && isExpanded) {
+        setState(() {
+          isExpanded = !isExpanded;
+        });
+      }
+    },
+    canPop: false,
+    child: Scaffold(
+      body: Container(
+        color: Colors.white,
+        child: Stack(
+          children: [
+            SizedBox(
+              height: screenSize.height,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.vertical,
+                // physics:
+                //     isExpanded
+                //         ? const NeverScrollableScrollPhysics()
+                //         : const PageScrollPhysics(),
+                child: Column(
+                  children: [
+                    AnimatedContainer(
+                      alignment: Alignment.bottomCenter,
+                      padding: EdgeInsets.only(bottom: 10),
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      height: isExpanded ? 0 : 100,
+                      // color: const Color.fromARGB(137, 148, 147, 147),
+                      child: Text("Shopping Store", style: TextStyle(fontSize: 20)),
+                    ),
+                    Container(
+                      height: isExpanded ? screenSize.height * 0.7 : 250,
+                      width: screenSize.width,
+                      child: Stack(
+                        children: [
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            top: 0,
+                            bottom: 0,
+                            width: screenSize.width,
+                            // height: isExpanded ? screenSize.height * 0.3 : 300, // Adjust height as needed
+                            child: PageView.builder(
+                              controller:
+                                  isExpanded
+                                      ? PageController(viewportFraction: 1)
+                                      : PageController(viewportFraction: 0.8),
+                              scrollDirection: Axis.horizontal,
+                              physics:
+                                  isExpanded
+                                      ? const NeverScrollableScrollPhysics()
+                                      : const PageScrollPhysics(),
+                              itemCount: _images.length,
+                              onPageChanged: (value) {
+                                setState(() {
+                                  _currentPage = value;
+                                });
+                              },
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      isExpanded = !isExpanded;
+                                    });
+                                    scrollToTop();
+                                  },
+                                  child: Container(
+                                    margin: isExpanded ? EdgeInsets.symmetric() : EdgeInsets.symmetric(horizontal: 5,),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                        isExpanded ? 0 : 10,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 10,
+                                          spreadRadius: 2,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Container(
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(10,),
+                                            child: CachedNetworkImage(
+                                              imageUrl: _images[index]['image'] as String,
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) => 
+                                                  Center(child: CircularProgressIndicator(),), // Loading indicator
+                                              errorWidget:(context, url, error) => Icon(Icons.error,), // Error fallback
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: 5,
+                                          top: 5,
+                                          child: IconButton(
+                                            onPressed: () {
+                                              print((index + 1).toString());
+                                              setState(() {
+                                                // checked = !checked;
+                                                if (numberchecked.contains(index,)) {
+                                                  numberchecked.remove(index);
+                                                } else {
+                                                  numberchecked.add(index);
+                                                }
+                                              });
+                                            },
+                                            icon: Icon(
+                                              Icons.favorite,
+                                              color:
+                                                  numberchecked.contains(index)
+                                                      ? Colors.red
+                                                      : Colors.white,
+                                              size: 30,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    AnimatedContainer(
+                        duration: Duration(milliseconds: 500),
+                        height: isExpanded ? 0 : screenSize.height, 
+                        width: screenSize.width,
+                        color: Colors.transparent,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 40,),
+                            Container(padding: EdgeInsets.symmetric(horizontal: 10),width: screenSize.width,child: Text("Running", style: TextStyle(color: Colors.black45, fontSize: 20, fontWeight: FontWeight.w500),),),
+                            SizedBox(height: 20,),
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              height: 260,
+                              // color: Colors.red,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 230,
+                                      height: 250,
+                                      padding: EdgeInsets.symmetric(horizontal: 5),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/377758/01/sv01/fnd/PNA/fmt/png/ForeverRUN-NITRO%E2%84%A2-Women's-Running-Shoes",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 230,
+                                      height: 250,
+                                      padding: EdgeInsets.symmetric(horizontal: 5),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          "https://static.nike.com/a/images/t_PDP_936_v1/f_auto,q_auto:eco/450ed1df-8e17-4d87-a244-85697874661c/NIKE+REVOLUTION+7.png",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 230,
+                                      height: 250,
+                                      padding: EdgeInsets.symmetric(horizontal: 5),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/9c74fd7c-37e1-41f6-b9cd-275d35f202ef/custom-reactx-infinity-rn-4-by-you.png",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 230,
+                                      height: 250,
+                                      decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                            blurRadius: 4,
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 2,
+                                            offset: Offset(4, 4)
+                                          )
+                                        ]
+                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 5),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_600,h_600/global/399406/01/sv01/fnd/PNA/fmt/png/SOFTRIDE-Mayve-Big-Kids'-Running-Shoes",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                    ),
+
+                    if (isExpanded)
+                      Container(
+                        // height: 400,
+                        width: double.infinity,
+                        decoration: BoxDecoration(color: Colors.tealAccent),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Names and the Price
+                            SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 5),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                      _images[_currentPage]["name"] as String,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          _images[_currentPage]["description"] as String,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(right: 5),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                    _images[_currentPage]["brand"] as String,
+                                        style: TextStyle(
+                                          color: Colors.lightBlueAccent,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                    "\$${(_images[_currentPage]["oldprice"] as double).toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          decoration: TextDecoration.lineThrough,
+                                          decorationColor: Colors.red,
+                                          decorationThickness: 2
+                                        ),
+                                      ),
+                                      Text(
+                                    "\$${(_images[_currentPage]["price"] as double).toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // end of the name widget
+                            // Sizes Widget
+                            Container(
+                              height: 100,
+                              padding: EdgeInsets.only(top: 10),
+                              decoration: BoxDecoration(
+                                // border: Border.all()
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "AVAILABLE SIZES",
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: (_images[_currentPage]["sizes"] as List<int>).map((size) => 
+                                                Container(
+                                                  margin: EdgeInsets.all(3),
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        if (sizes.contains(size)) {
+                                                          sizes.remove(size);
+                                                        } else {
+                                                          sizes.add(size);
+                                                        }
+                                                      });
+                                                      print(sizes);
+                                                    },
+                                                    style: TextButton.styleFrom(
+                                                      backgroundColor:sizes.contains(size) ? Colors.black : Colors.transparent,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(8,),
+                                                        side: sizes.contains(size) ? BorderSide(color: Colors.black, width: 2,) : BorderSide(width: 0, color: Colors.white54,),
+                                                    ),
+                                                    ),
+                                                    child: Text(
+                                                      "EU${size.toString()}",
+                                                      style: TextStyle(
+                                                        color:sizes.contains(size) ? Colors.white : Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 17,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // End Sizes Widget
+                            // Colors 
+                            Container(
+                              padding: EdgeInsets.only(top: 10),
+                              width: screenSize.width,
+                              decoration: BoxDecoration(
+                                // border: Border.all()
+                              ),
+                              child: Column(mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "AVAILABLE COLORS",
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: screenSize.width,
+                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      border: Border.all()
+                                    ),
+                                    child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      // mainAxisAlignment: MainAxisAlignment.start,
+                                      // crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: (_images[_currentPage]["colors"] as List<String>).map((color) => (
+                                        GestureDetector(
+                                          onTap: () {
+                                            print(color);
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            margin: EdgeInsets.only(right: 8),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(50),
+                                              color: getColorFromString(color),
+                                            ),
+                                          )
+                                        )
+                                        )
+                                      ).toList(),
+                                    ),
+                                  ),
+                                  )
+                                ],
+                              ),
+                            )
+                            // End Colors
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            if (isExpanded)
+              Positioned(
+                bottom: 20,
+                right: 20,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      // print(_)
+                    },
+                    child: Image.asset('assets/icons/shopping.png', width: 40,height: 40,),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    ),
+    );
+  }
+
+
+}
+
+
+//             AnimatedPositioned(
+//             duration: const Duration(milliseconds: 300),
+//             curve: Curves.easeInOut,
+//             top: isExpanded ? 0 : /*(screenSize.height / 2 - initialSize - 100)*/ 0,
+//             // left: isExpanded ? 0 : /*(screenSize.width / 2 - initialSize / 2)*/ 0,
+//             width: isExpanded ? screenSize.width : screenSize.width,
+//             height: isExpanded ? screenSize.height * 0.3 : 300, // Adjust height as needed
+//             child: PageView.builder(
+//               controller: isExpanded ? PageController(viewportFraction: 1) : PageController(viewportFraction: 0.8),
+//               scrollDirection: Axis.horizontal,
+//               physics: isExpanded ? const NeverScrollableScrollPhysics() : const PageScrollPhysics(parent: BouncingScrollPhysics()),
+//               itemCount: 5,
+//               onPageChanged: (value) {
+//                 setState(() {
+//                   _currentPage = value;
+//                 });
+//               },
+//               itemBuilder: (context, index) {
+//                 return GestureDetector(
+//                   // onVerticalDragEnd: (details) {
+//                   // if (details.velocity.pixelsPerSecond.dy < -500) { // Swipe up
+//                   //   setState(() => isExpanded = true);
+//                   // } else if (details.velocity.pixelsPerSecond.dy > 500) { // Swipe down
+//                   //   setState(() => isExpanded = false);
+//                   // }
+//                   // },
+//                   onTap: () {
+//                     setState(() {
+//                       isExpanded = !isExpanded;
+//                     });
+//                   },
+//                   child: Container(
+//                     decoration: BoxDecoration(
+//                       borderRadius: BorderRadius.circular(isExpanded ? 0 : 10),
+//                       boxShadow: [
+//                         BoxShadow(
+//                           color: Colors.black26,
+//                           blurRadius: 10,
+//                           spreadRadius: 2,
+//                         ),
+//                       ],
+                      
+//                     ),
+//                     child: Image.network(
+//                       _images[index]['image'] as String,
+//                       fit: BoxFit.cover,
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
+//           Positioned(
+//             top: 300,
+//             bottom: 0,
+//             left: 0,
+//             right: 0,
+//             child: AnimatedOpacity(
+//               duration: Duration(milliseconds: 300),
+//               opacity: isExpanded ? 0 : 1,
+//               child: SingleChildScrollView(
+//                 child: Column(
+//                   children: [
+//                     Container(
+//                       height: screenSize.height,
+//                       width: screenSize.width,
+//                       color: Colors.lightGreenAccent,
+//                       child: Column(
+//                         children: [
+//                           Text("data", style: TextStyle(fontSize: 20),),
+//                           ElevatedButton(
+//                             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ScrollScreen())),
+//                             child: Text("Mover bro!", style: TextStyle(color: Colors.red),),
+//                           ),
+//                           Text("data", style: TextStyle(fontSize: 20),),
+//                         ],
+//                       ),
+//                   )
+//                   ],
+//                 ),
+//               )
+//             ),
+//           ),
