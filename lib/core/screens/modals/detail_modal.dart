@@ -24,7 +24,6 @@ class _LeftModalScreen extends State<LeftModalScreen> {
   double _cartTop = -100;
   String _colorPicked = '';
   String _pickedSize = '';
-  String _messageCart = 'Add To Cart';
   int Qte = 0;
 
   @override
@@ -386,9 +385,6 @@ class _LeftModalScreen extends State<LeftModalScreen> {
                             };
 
                             cartProvider.addToCart(product);
-                            setState(() {
-                              _messageCart = "Added to Cart!";
-                            });
                           },
                           style: ButtonStyle(
                             backgroundColor: WidgetStatePropertyAll(exist ? Colors.grey :Colors.deepOrangeAccent),
